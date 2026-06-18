@@ -1,0 +1,24 @@
+{
+  "name": "@social/db",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "migrate:dev": "prisma migrate dev",
+    "migrate:test": "prisma migrate deploy",
+    "migrate:deploy": "prisma migrate deploy",
+    "studio": "prisma studio",
+    "seed": "ts-node seed.ts",
+    "generate": "prisma generate"
+  },
+  "exports": {
+    ".": "./generated/client/index.js"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.16.0"
+  },
+  "devDependencies": {
+    "prisma": "^5.16.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.0"
+  }
+}
