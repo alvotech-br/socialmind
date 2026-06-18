@@ -237,3 +237,6 @@ Formato padrão de resposta de erro:
 - **shadcn/ui:** https://ui.shadcn.com
 - **next-intl:** https://next-intl-docs.vercel.app
 - **i18next:** https://www.i18next.com
+
+
+
