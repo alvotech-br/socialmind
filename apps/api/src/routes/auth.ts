@@ -245,7 +245,7 @@ export const authRoutes: FastifyPluginAsync = async (fastify) => {
       ? authenticator.verify({ token: code, secret: user.twoFaSecret })
       : false
 
-    const backupIndex = user.twoFaBackupCodes.findIndex((c) => c === code && !c.startsWith('used:'))
+    const backupIndex = user.twoFaBackupCodes.findIndex((c: string) => c === code && !c.startsWith('used:'))
     const usedBackup = !isValid && backupIndex >= 0
 
     if (!isValid && !usedBackup) {
