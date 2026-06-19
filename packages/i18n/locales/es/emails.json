@@ -1,0 +1,11 @@
+{
+  "passwordReset": {
+    "subject": "Restablecimiento de contraseña",
+    "body": "Haz clic en el enlace a continuación para restablecer tu contraseña. El enlace expira en 1 hora.",
+    "button": "Restablecer contraseña"
+  },
+  "welcome": {
+    "subject": "Bienvenido a la plataforma",
+    "body": "Tu cuenta ha sido creada exitosamente. Disfruta de tus {{days}} días de prueba gratuita."
+  }
+}
