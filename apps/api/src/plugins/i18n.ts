@@ -15,22 +15,24 @@ declare module 'fastify' {
 }
 
 const i18nPlugin: FastifyPluginAsync = async (fastify) => {
-  await i18next.use(FsBackend).init({
-    lng: defaultLocale,
-    fallbackLng: defaultLocale,
-    supportedLngs: [...locales],
-    ns: [...namespaces],
-    defaultNS: 'common',
-    backend: {
-      loadPath: `${localesDir}/{{lng}}/{{ns}}.json`,
-    },
-    interpolation: { escapeValue: false },
-    initImmediate: false,
-  })
+  if (!i18next.isInitialized) {
+    await i18next.use(FsBackend).init({
+      lng: defaultLocale,
+      fallbackLng: defaultLocale,
+      supportedLngs: [...locales],
+      ns: [...namespaces],
+      defaultNS: 'common',
+      backend: {
+        loadPath: `${localesDir}/{{lng}}/{{ns}}.json`,
+      },
+      interpolation: { escapeValue: false },
+      initImmediate: false,
+    })
+  }
 
   fastify.decorate('t', i18next.t.bind(i18next))
 
-  fastify.addHook('preHandler', async (request: FastifyRequest) => {
+  fastify.addHook('onRequest', async (request: FastifyRequest) => {
     // request.user é injetado pelo @fastify/jwt quando autenticado
     const user = (request as FastifyRequest & { user?: { locale?: string } }).user
 

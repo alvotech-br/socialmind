@@ -25,6 +25,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Generate Prisma client
+        run: pnpm --filter db generate
+
       - name: Lint
         run: pnpm --filter api lint
 
@@ -79,6 +82,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Generate Prisma client
+        run: pnpm --filter db generate
+
       - name: Run migrations (test DB)
         run: pnpm --filter db migrate:test
 
@@ -109,6 +115,9 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm --filter db generate
 
       - name: Build API
         run: pnpm --filter api build
