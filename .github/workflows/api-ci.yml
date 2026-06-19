@@ -59,7 +59,7 @@ jobs:
           --health-timeout 5s
           --health-retries 10
     env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL_TEST }}
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/socialplatform_test
       REDIS_URL: redis://localhost:6379
       JWT_SECRET: jwt-secret-ci-only
       NODE_ENV: test
