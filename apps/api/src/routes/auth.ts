@@ -35,10 +35,10 @@ export const authRoutes: FastifyPluginAsync = async (fastify) => {
     if (!parsed.success) {
       const issue = parsed.error.errors[0]
       if (issue?.path.includes('email')) {
-        return reply.status(400).send({ error: 'INVALID_EMAIL', message: request.t('errors.invalidEmail') })
+        return reply.status(400).send({ error: 'INVALID_EMAIL', message: request.t('errors:invalidEmail') })
       }
       if (issue?.path.includes('password')) {
-        return reply.status(400).send({ error: 'WEAK_PASSWORD', message: request.t('errors.weakPassword') })
+        return reply.status(400).send({ error: 'WEAK_PASSWORD', message: request.t('errors:weakPassword') })
       }
       return reply.status(400).send({ error: 'INVALID_INPUT', message: issue?.message })
     }
@@ -48,13 +48,13 @@ export const authRoutes: FastifyPluginAsync = async (fastify) => {
     if (!acceptedTerms || !acceptedPrivacy) {
       return reply.status(400).send({
         error: 'LGPD_CONSENT_REQUIRED',
-        message: request.t('errors.lgpdConsentRequired'),
+        message: request.t('errors:lgpdConsentRequired'),
       })
     }
 
     const existing = await prisma.user.findUnique({ where: { email } })
     if (existing) {
-      return reply.status(409).send({ error: 'EMAIL_EXISTS', message: request.t('errors.emailAlreadyExists') })
+      return reply.status(409).send({ error: 'EMAIL_EXISTS', message: request.t('errors:emailAlreadyExists') })
     }
 
     const userLocale = locale ?? (request.locale as 'pt-BR' | 'es' | 'en') ?? 'pt-BR'
@@ -185,7 +185,7 @@ export const authRoutes: FastifyPluginAsync = async (fastify) => {
 
     const parsed = schema.safeParse(request.body)
     if (!parsed.success) {
-      return reply.status(401).send({ error: 'INVALID_CREDENTIALS', message: request.t('errors.invalidCredentials') })
+      return reply.status(401).send({ error: 'INVALID_CREDENTIALS', message: request.t('errors:invalidCredentials') })
     }
 
     const { email, password } = parsed.data
@@ -193,7 +193,7 @@ export const authRoutes: FastifyPluginAsync = async (fastify) => {
     const validPassword = user ? await bcrypt.compare(password, user.passwordHash) : false
 
     if (!user || !validPassword) {
-      return reply.status(401).send({ error: 'INVALID_CREDENTIALS', message: request.t('errors.invalidCredentials') })
+      return reply.status(401).send({ error: 'INVALID_CREDENTIALS', message: request.t('errors:invalidCredentials') })
     }
 
     await prisma.auditLog.create({
@@ -231,11 +231,11 @@ export const authRoutes: FastifyPluginAsync = async (fastify) => {
     try {
       payload = fastify.jwt.verify(parsed.data.tempToken) as typeof payload
     } catch {
-      return reply.status(401).send({ error: 'UNAUTHORIZED', message: request.t('errors.unauthorized') })
+      return reply.status(401).send({ error: 'UNAUTHORIZED', message: request.t('errors:unauthorized') })
     }
 
     if (!payload.twoFaPending) {
-      return reply.status(401).send({ error: 'UNAUTHORIZED', message: request.t('errors.unauthorized') })
+      return reply.status(401).send({ error: 'UNAUTHORIZED', message: request.t('errors:unauthorized') })
     }
 
     const user = await prisma.user.findUniqueOrThrow({ where: { id: payload.id } })
@@ -249,7 +249,7 @@ export const authRoutes: FastifyPluginAsync = async (fastify) => {
     const usedBackup = !isValid && backupIndex >= 0
 
     if (!isValid && !usedBackup) {
-      return reply.status(401).send({ error: 'INVALID_2FA', message: request.t('errors.invalidCredentials') })
+      return reply.status(401).send({ error: 'INVALID_2FA', message: request.t('errors:invalidCredentials') })
     }
 
     if (usedBackup) {
@@ -280,14 +280,14 @@ export const authRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.post('/refresh', async (request, reply) => {
     const raw = request.cookies['refreshToken']
     if (!raw) {
-      return reply.status(401).send({ error: 'UNAUTHORIZED', message: request.t('errors.unauthorized') })
+      return reply.status(401).send({ error: 'UNAUTHORIZED', message: request.t('errors:unauthorized') })
     }
 
     const tokenHash = hashToken(raw)
     const stored = await prisma.refreshToken.findUnique({ where: { tokenHash } })
 
     if (!stored || stored.revokedAt || stored.expiresAt < new Date()) {
-      return reply.status(401).send({ error: 'UNAUTHORIZED', message: request.t('errors.unauthorized') })
+      return reply.status(401).send({ error: 'UNAUTHORIZED', message: request.t('errors:unauthorized') })
     }
 
     await prisma.refreshToken.update({ where: { id: stored.id }, data: { revokedAt: new Date() } })
@@ -362,7 +362,7 @@ export const authRoutes: FastifyPluginAsync = async (fastify) => {
     if (!parsed.success) {
       const issue = parsed.error.errors[0]
       if (issue?.path.includes('password')) {
-        return reply.status(400).send({ error: 'WEAK_PASSWORD', message: request.t('errors.weakPassword') })
+        return reply.status(400).send({ error: 'WEAK_PASSWORD', message: request.t('errors:weakPassword') })
       }
       return reply.status(400).send({ error: 'INVALID_INPUT', message: issue?.message })
     }
@@ -372,11 +372,11 @@ export const authRoutes: FastifyPluginAsync = async (fastify) => {
     const record = await prisma.passwordResetToken.findUnique({ where: { tokenHash } })
 
     if (!record || record.usedAt) {
-      return reply.status(400).send({ error: 'TOKEN_INVALID', message: request.t('errors.tokenInvalid') })
+      return reply.status(400).send({ error: 'TOKEN_INVALID', message: request.t('errors:tokenInvalid') })
     }
 
     if (record.expiresAt < new Date()) {
-      return reply.status(400).send({ error: 'TOKEN_EXPIRED', message: request.t('errors.tokenExpired') })
+      return reply.status(400).send({ error: 'TOKEN_EXPIRED', message: request.t('errors:tokenExpired') })
     }
 
     const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS)
@@ -420,12 +420,12 @@ export const authRoutes: FastifyPluginAsync = async (fastify) => {
     const dbUser = await prisma.user.findUniqueOrThrow({ where: { id: user.id } })
 
     if (!dbUser.twoFaSecret) {
-      return reply.status(400).send({ error: 'INVALID_INPUT', message: request.t('errors.unauthorized') })
+      return reply.status(400).send({ error: 'INVALID_INPUT', message: request.t('errors:unauthorized') })
     }
 
     const isValid = authenticator.verify({ token: parsed.data.code, secret: dbUser.twoFaSecret })
     if (!isValid) {
-      return reply.status(400).send({ error: 'INVALID_2FA_CODE', message: request.t('errors.invalidCredentials') })
+      return reply.status(400).send({ error: 'INVALID_2FA_CODE', message: request.t('errors:invalidCredentials') })
     }
 
     const backupCodes = Array.from({ length: 8 }, () => crypto.randomBytes(4).toString('hex'))
@@ -454,7 +454,7 @@ export const authRoutes: FastifyPluginAsync = async (fastify) => {
 
     const valid = await bcrypt.compare(parsed.data.password, dbUser.passwordHash)
     if (!valid) {
-      return reply.status(401).send({ error: 'INVALID_CREDENTIALS', message: request.t('errors.invalidCredentials') })
+      return reply.status(401).send({ error: 'INVALID_CREDENTIALS', message: request.t('errors:invalidCredentials') })
     }
 
     await prisma.user.update({

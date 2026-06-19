@@ -14,7 +14,7 @@ const authPlugin: FastifyPluginAsync = async (fastify) => {
     } catch {
       return reply.status(401).send({
         error: 'UNAUTHORIZED',
-        message: request.t('errors.unauthorized'),
+        message: request.t('errors:unauthorized'),
       })
     }
   })

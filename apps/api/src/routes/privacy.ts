@@ -19,7 +19,7 @@ export const privacyRoutes: FastifyPluginAsync = async (fastify) => {
     if (!parsed.success) {
       return reply.status(400).send({
         error: 'INVALID_INPUT',
-        message: parsed.error.errors[0]?.message ?? request.t('errors.invalidEmail'),
+        message: parsed.error.errors[0]?.message ?? request.t('errors:invalidEmail'),
       })
     }
 
