@@ -86,7 +86,7 @@ jobs:
         run: pnpm --filter api test:coverage
 
       - name: Upload coverage to Codecov
-        if: ${{ secrets.CODECOV_TOKEN != '' }}
+        if: ${{ vars.CODECOV_ENABLED == 'true' }}
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
