@@ -31,7 +31,8 @@ const i18nPlugin: FastifyPluginAsync = async (fastify) => {
   fastify.decorate('t', i18next.t.bind(i18next))
 
   fastify.addHook('preHandler', async (request: FastifyRequest) => {
-    const user = request.user as { locale?: string } | undefined
+    // request.user é injetado pelo @fastify/jwt quando autenticado
+    const user = (request as FastifyRequest & { user?: { locale?: string } }).user
 
     const locale =
       user?.locale ??
