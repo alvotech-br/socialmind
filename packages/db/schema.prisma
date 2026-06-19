@@ -1,0 +1,236 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/client"
+}
+
+// prisma db seed executa este arquivo
+// configurado em package.json: "seed": "ts-node seed.ts"
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── USUARIOS ───────────────────────────────────────────────────────────────────
+
+model User {
+  id               String    @id @default(uuid())
+  email            String    @unique
+  passwordHash     String
+  name             String
+  locale           String    @default("pt-BR")
+  twoFaSecret      String?
+  twoFaEnabled     Boolean   @default(false)
+  twoFaBackupCodes String[]
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  deletedAt        DateTime?
+
+  workspaceMembers   WorkspaceMember[]
+  auditLogs          AuditLog[]
+  consentRecords     ConsentRecord[]
+  passwordResetTokens PasswordResetToken[]
+  refreshTokens      RefreshToken[]
+  dataDeletionRequests DataDeletionRequest[]
+}
+
+// ── WORKSPACES ─────────────────────────────────────────────────────────────────
+
+model Workspace {
+  id                   String      @id @default(uuid())
+  ownerId              String
+  name                 String
+  slug                 String      @unique
+  accountType          AccountType @default(SELF)
+  selfOwned            Boolean     @default(false)
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  stripePriceId        String?
+  planType             PlanType    @default(TRIAL)
+  trialEndsAt          DateTime?
+  postsThisMonth       Int         @default(0)
+  postsMonthResetAt    DateTime?
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+  deletedAt            DateTime?
+
+  members  WorkspaceMember[]
+  clients  Client[]
+  auditLogs AuditLog[]
+}
+
+enum AccountType {
+  AGENCY
+  SELF
+}
+
+enum PlanType {
+  TRIAL
+  STARTER
+  PRO
+  AGENCY
+}
+
+model WorkspaceMember {
+  id          String   @id @default(uuid())
+  workspaceId String
+  userId      String
+  role        Role     @default(VIEWER)
+  createdAt   DateTime @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
+
+  @@unique([workspaceId, userId])
+  @@index([workspaceId])
+  @@index([userId])
+}
+
+enum Role {
+  OWNER
+  ADMIN
+  EDITOR
+  VIEWER
+}
+
+// ── CLIENTES ───────────────────────────────────────────────────────────────────
+
+model Client {
+  id          String    @id @default(uuid())
+  workspaceId String
+  name        String
+  handle      String?
+  avatarUrl   String?
+  isSelf      Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  workspace      Workspace       @relation(fields: [workspaceId], references: [id])
+  socialAccounts SocialAccount[]
+
+  @@index([workspaceId, deletedAt])
+}
+
+// ── CONTAS SOCIAIS ─────────────────────────────────────────────────────────────
+
+model SocialAccount {
+  id             String    @id @default(uuid())
+  clientId       String
+  platform       Platform
+  platformUserId String
+  handle         String
+  accessToken    String
+  refreshToken   String?
+  expiresAt      DateTime?
+  needsReauth    Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  client Client @relation(fields: [clientId], references: [id])
+
+  @@unique([clientId, platform])
+  @@index([clientId, platform])
+}
+
+enum Platform {
+  INSTAGRAM
+  TIKTOK
+  YOUTUBE
+}
+
+// ── LGPD ───────────────────────────────────────────────────────────────────────
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  workspaceId String?
+  userId      String
+  action      String
+  entity      String?
+  entityId    String?
+  metadata    Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  user      User       @relation(fields: [userId], references: [id])
+  workspace Workspace? @relation(fields: [workspaceId], references: [id])
+
+  @@index([userId])
+  @@index([workspaceId])
+  @@index([createdAt])
+}
+
+model ConsentRecord {
+  id          String      @id @default(uuid())
+  userId      String?
+  sessionId   String?
+  consentType ConsentType
+  version     String
+  acceptedAt  DateTime    @default(now())
+  ip          String?
+  userAgent   String?
+  metadata    Json?
+  locale      String?
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([userId, consentType])
+  @@index([sessionId])
+}
+
+enum ConsentType {
+  TERMS
+  PRIVACY
+  COOKIES
+}
+
+model DataDeletionRequest {
+  id          String         @id @default(uuid())
+  userId      String
+  status      DeletionStatus @default(PENDING)
+  reason      String?
+  requestedAt DateTime       @default(now())
+  completedAt DateTime?
+  notes       String?
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, status])
+}
+
+enum DeletionStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  CANCELLED
+}
+
+// ── AUTH ────────────────────────────────────────────────────────────────────────
+
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([tokenHash, expiresAt])
+}
+
+model RefreshToken {
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([tokenHash])
+  @@index([userId])
+}

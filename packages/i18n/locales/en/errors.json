@@ -1,0 +1,14 @@
+{
+  "invalidEmail": "Invalid email address",
+  "weakPassword": "Password must be at least 8 characters long, contain 1 uppercase letter and 1 number",
+  "emailAlreadyExists": "This email is already registered",
+  "invalidCredentials": "Incorrect email or password",
+  "lgpdConsentRequired": "You must accept the terms of use and privacy policy to continue",
+  "tokenExpired": "This link has expired. Please request a new one.",
+  "tokenInvalid": "Invalid link.",
+  "unauthorized": "Unauthorized access",
+  "forbidden": "You do not have permission to perform this action",
+  "notFound": "Resource not found",
+  "planLimitReached": "Plan limit reached. Upgrade to continue.",
+  "selfWorkspaceCannotAddClients": "A self-managed account cannot have additional clients"
+}

@@ -1,0 +1,16 @@
+{
+  "name": "@social/i18n",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./locales/*": "./locales/*"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}

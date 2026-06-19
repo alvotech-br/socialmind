@@ -1,0 +1,61 @@
+name: Deploy HML
+
+on:
+  workflow_run:
+    workflows: [API CI]
+    branches: [develop]
+    types: [completed]
+
+jobs:
+  deploy-hml:
+    name: Deploy para HML
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    environment: hml
+    env:
+      DATABASE_URL: ${{ secrets.HML_DATABASE_URL }}
+      REDIS_URL: ${{ secrets.HML_REDIS_URL }}
+      JWT_SECRET: ${{ secrets.HML_JWT_SECRET }}
+      STRIPE_SECRET_KEY: ${{ secrets.HML_STRIPE_SECRET_KEY }}
+      STRIPE_WEBHOOK_SECRET: ${{ secrets.HML_STRIPE_WEBHOOK_SECRET }}
+      S3_ACCESS_KEY_ID: ${{ secrets.HML_S3_ACCESS_KEY_ID }}
+      S3_SECRET_ACCESS_KEY: ${{ secrets.HML_S3_SECRET_ACCESS_KEY }}
+      S3_BUCKET: socialplatform-hml
+      DEFAULT_LOCALE: pt-BR
+      NODE_ENV: staging
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: develop
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run migrations (HML — automático)
+        run: pnpm --filter db migrate:deploy
+
+      - name: Deploy para Railway/Render HML
+        run: |
+          echo "Deploying to HML..."
+          # Substituir pelo comando do Railway ou Render:
+          # railway up --service api --environment hml
+          # ou: render deploy --service-id $RENDER_SERVICE_ID
+        env:
+          DEPLOY_TOKEN: ${{ secrets.HML_DEPLOY_TOKEN }}
+
+      - name: Health check
+        run: |
+          sleep 15
+          curl --fail --retry 5 --retry-delay 5 \
+            https://api-hml.suaplataforma.com/health \
+            | grep '"status":"ok"'
+          echo "✓ Health check OK"
