@@ -1,0 +1,11 @@
+{
+  "passwordReset": {
+    "subject": "Password reset",
+    "body": "Click the link below to reset your password. The link expires in 1 hour.",
+    "button": "Reset password"
+  },
+  "welcome": {
+    "subject": "Welcome to the platform",
+    "body": "Your account has been successfully created. Enjoy your {{days}}-day free trial."
+  }
+}

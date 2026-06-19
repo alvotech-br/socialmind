@@ -1,0 +1,11 @@
+{
+  "passwordReset": {
+    "subject": "Redefinição de senha",
+    "body": "Clique no link abaixo para redefinir sua senha. O link expira em 1 hora.",
+    "button": "Redefinir senha"
+  },
+  "welcome": {
+    "subject": "Bem-vindo à plataforma",
+    "body": "Sua conta foi criada com sucesso. Aproveite seus {{days}} dias de trial gratuito."
+  }
+}

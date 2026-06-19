@@ -1,0 +1,75 @@
+name: Deploy PROD
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  approve:
+    name: Aguardar aprovação manual
+    runs-on: ubuntu-latest
+    environment: prod
+    steps:
+      - name: Aprovação recebida
+        run: echo "✓ Deploy em PROD aprovado. Prosseguindo..."
+
+  deploy-prod:
+    name: Deploy para PROD
+    needs: approve
+    runs-on: ubuntu-latest
+    environment: prod
+    env:
+      DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+      REDIS_URL: ${{ secrets.PROD_REDIS_URL }}
+      JWT_SECRET: ${{ secrets.PROD_JWT_SECRET }}
+      STRIPE_SECRET_KEY: ${{ secrets.PROD_STRIPE_SECRET_KEY }}
+      STRIPE_WEBHOOK_SECRET: ${{ secrets.PROD_STRIPE_WEBHOOK_SECRET }}
+      S3_ACCESS_KEY_ID: ${{ secrets.PROD_S3_ACCESS_KEY_ID }}
+      S3_SECRET_ACCESS_KEY: ${{ secrets.PROD_S3_SECRET_ACCESS_KEY }}
+      S3_BUCKET: socialplatform-prod
+      DEFAULT_LOCALE: pt-BR
+      NODE_ENV: production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: ATENÇÃO — Migrations em PROD são manuais
+        run: |
+          echo "⚠️  LEMBRETE OBRIGATÓRIO:"
+          echo "    Migrations em PROD NUNCA são executadas automaticamente."
+          echo "    Antes de continuar, confirme que:"
+          echo "    1. O script de migration foi revisado e aprovado"
+          echo "    2. 'prisma migrate deploy' foi executado manualmente no banco de PROD"
+          echo "    3. A aplicação das migrations foi verificada"
+          echo ""
+          echo "    Se as migrations ainda não foram aplicadas, cancele este deploy agora."
+
+      - name: Deploy para Railway/Render PROD
+        run: |
+          echo "Deploying to PROD..."
+          # Substituir pelo comando do Railway ou Render:
+          # railway up --service api --environment production
+          # ou: render deploy --service-id $RENDER_SERVICE_ID
+        env:
+          DEPLOY_TOKEN: ${{ secrets.PROD_DEPLOY_TOKEN }}
+
+      - name: Health check
+        run: |
+          sleep 15
+          curl --fail --retry 5 --retry-delay 5 \
+            https://api.suaplataforma.com/health \
+            | grep '"status":"ok"'
+          echo "✓ Health check OK — PROD está no ar"

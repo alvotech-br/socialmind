@@ -1,0 +1,14 @@
+{
+  "invalidEmail": "Correo electrónico inválido",
+  "weakPassword": "La contraseña debe tener al menos 8 caracteres, 1 letra mayúscula y 1 número",
+  "emailAlreadyExists": "Este correo electrónico ya está registrado",
+  "invalidCredentials": "Correo electrónico o contraseña incorrectos",
+  "lgpdConsentRequired": "Es necesario aceptar los términos de uso y la política de privacidad para continuar",
+  "tokenExpired": "Este enlace ha expirado. Solicite uno nuevo.",
+  "tokenInvalid": "Enlace inválido.",
+  "unauthorized": "Acceso no autorizado",
+  "forbidden": "No tienes permiso para realizar esta acción",
+  "notFound": "Recurso no encontrado",
+  "planLimitReached": "Límite del plan alcanzado. Actualiza tu plan para continuar.",
+  "selfWorkspaceCannotAddClients": "Una cuenta propia no puede tener clientes adicionales"
+}

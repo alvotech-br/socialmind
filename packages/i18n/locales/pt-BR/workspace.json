@@ -1,0 +1,24 @@
+{
+  "workspace": "Workspace",
+  "workspaces": "Workspaces",
+  "members": "Membros",
+  "clients": "Clientes",
+  "addClient": "Adicionar cliente",
+  "addMember": "Adicionar membro",
+  "roles": {
+    "OWNER": "Proprietário",
+    "ADMIN": "Administrador",
+    "EDITOR": "Editor",
+    "VIEWER": "Visualizador"
+  },
+  "plans": {
+    "TRIAL": "Trial",
+    "STARTER": "Starter",
+    "PRO": "Pro",
+    "AGENCY": "Agency"
+  },
+  "accountTypes": {
+    "AGENCY": "Agência",
+    "SELF": "Conta própria"
+  }
+}
