@@ -11,6 +11,7 @@ import { authRoutes } from './routes/auth.js'
 import { privacyRoutes } from './routes/privacy.js'
 import { clientRoutes } from './routes/clients.js'
 import { workspaceRoutes } from './routes/workspaces.js'
+import { uploadRoutes } from './routes/uploads.js'
 
 const SENSITIVE_FIELDS = ['password', 'passwordHash', 'accessToken', 'refreshToken', 'twoFaSecret']
 
@@ -36,6 +37,7 @@ export const buildApp = async () => {
   await app.register(privacyRoutes, { prefix: '/privacy' })
   await app.register(workspaceRoutes, { prefix: '/workspaces' })
   await app.register(clientRoutes, { prefix: '/workspaces/:workspaceId/clients' })
+  await app.register(uploadRoutes, { prefix: '/uploads' })
 
   app.get('/health', async () => ({
     status: 'ok',

@@ -10,5 +10,9 @@
   "forbidden": "You do not have permission to perform this action",
   "notFound": "Resource not found",
   "planLimitReached": "Plan limit reached. Upgrade to continue.",
-  "selfWorkspaceCannotAddClients": "A self-managed account cannot have additional clients"
+  "selfWorkspaceCannotAddClients": "A self-managed account cannot have additional clients",
+  "invalidMimeType": "File type not allowed",
+  "fileTooLarge": "The file exceeds the maximum allowed size (500 MB)",
+  "missingClientId": "A client is required for this upload",
+  "mediaAlreadyConfirmed": "This file has already been confirmed"
 }

@@ -26,12 +26,13 @@ model User {
   updatedAt        DateTime  @updatedAt
   deletedAt        DateTime?
 
-  workspaceMembers   WorkspaceMember[]
-  auditLogs          AuditLog[]
-  consentRecords     ConsentRecord[]
-  passwordResetTokens PasswordResetToken[]
-  refreshTokens      RefreshToken[]
+  workspaceMembers     WorkspaceMember[]
+  auditLogs            AuditLog[]
+  consentRecords       ConsentRecord[]
+  passwordResetTokens  PasswordResetToken[]
+  refreshTokens        RefreshToken[]
   dataDeletionRequests DataDeletionRequest[]
+  mediaFiles           MediaFile[]
 }
 
 // ── WORKSPACES ─────────────────────────────────────────────────────────────────
@@ -54,9 +55,10 @@ model Workspace {
   updatedAt            DateTime    @updatedAt
   deletedAt            DateTime?
 
-  members  WorkspaceMember[]
-  clients  Client[]
-  auditLogs AuditLog[]
+  members    WorkspaceMember[]
+  clients    Client[]
+  auditLogs  AuditLog[]
+  mediaFiles MediaFile[]
 }
 
 enum AccountType {
@@ -108,6 +110,7 @@ model Client {
 
   workspace      Workspace       @relation(fields: [workspaceId], references: [id])
   socialAccounts SocialAccount[]
+  mediaFiles     MediaFile[]
 
   @@index([workspaceId, deletedAt])
 }
@@ -204,6 +207,36 @@ enum DeletionStatus {
   PROCESSING
   COMPLETED
   CANCELLED
+}
+
+// ── MIDIA ──────────────────────────────────────────────────────────────────────
+
+model MediaFile {
+  id          String          @id @default(uuid())
+  workspaceId String
+  clientId    String
+  uploadedBy  String
+  key         String          @unique
+  bucket      String
+  mimeType    String
+  size        Int
+  status      MediaFileStatus @default(PENDING)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id])
+  client    Client    @relation(fields: [clientId], references: [id])
+  uploader  User      @relation(fields: [uploadedBy], references: [id])
+
+  @@index([workspaceId])
+  @@index([clientId])
+  @@index([uploadedBy])
+}
+
+enum MediaFileStatus {
+  PENDING
+  READY
+  FAILED
 }
 
 // ── AUTH ────────────────────────────────────────────────────────────────────────

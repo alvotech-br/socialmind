@@ -10,5 +10,9 @@
   "forbidden": "No tienes permiso para realizar esta acción",
   "notFound": "Recurso no encontrado",
   "planLimitReached": "Límite del plan alcanzado. Actualiza tu plan para continuar.",
-  "selfWorkspaceCannotAddClients": "Una cuenta propia no puede tener clientes adicionales"
+  "selfWorkspaceCannotAddClients": "Una cuenta propia no puede tener clientes adicionales",
+  "invalidMimeType": "Tipo de archivo no permitido",
+  "fileTooLarge": "El archivo supera el tamaño máximo permitido (500 MB)",
+  "missingClientId": "Es necesario indicar el cliente para esta subida",
+  "mediaAlreadyConfirmed": "Este archivo ya fue confirmado"
 }
