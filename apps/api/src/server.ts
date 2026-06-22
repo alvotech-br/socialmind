@@ -6,8 +6,11 @@ import rateLimit from '@fastify/rate-limit'
 import cookie from '@fastify/cookie'
 import i18nPlugin from './plugins/i18n.js'
 import authPlugin from './plugins/auth.js'
+import workspaceContextPlugin from './plugins/workspace-context.js'
 import { authRoutes } from './routes/auth.js'
 import { privacyRoutes } from './routes/privacy.js'
+import { clientRoutes } from './routes/clients.js'
+import { workspaceRoutes } from './routes/workspaces.js'
 
 const SENSITIVE_FIELDS = ['password', 'passwordHash', 'accessToken', 'refreshToken', 'twoFaSecret']
 
@@ -28,8 +31,11 @@ export const buildApp = async () => {
   })
   await app.register(i18nPlugin)
   await app.register(authPlugin)
+  await app.register(workspaceContextPlugin)
   await app.register(authRoutes, { prefix: '/auth' })
   await app.register(privacyRoutes, { prefix: '/privacy' })
+  await app.register(workspaceRoutes, { prefix: '/workspaces' })
+  await app.register(clientRoutes, { prefix: '/workspaces/:workspaceId/clients' })
 
   app.get('/health', async () => ({
     status: 'ok',
