@@ -88,11 +88,15 @@ prod (producao)
 
 ## i18n — regras
 - NUNCA escrever mensagens em hardcode no codigo
-- Toda mensagem usa chave: t('errors.invalidEmail')
+- Separador de namespace e ":" (nao ".")
+  CORRETO:   t('errors:unauthorized')
+  ERRADO:    t('errors.unauthorized')
 - E-mails e notificacoes tambem usam chaves traduzidas
 - Idioma padrao: pt-BR
 - Idioma do usuario: salvo em User.locale
 - Idioma da requisicao: detectado via Accept-Language
+- Hook i18n registrado em onRequest (nao preHandler) para que
+  request.t esteja disponivel antes do hook de autenticacao
 
 ## Estrutura de pastas
 apps/api           -> backend Fastify
@@ -103,8 +107,74 @@ packages/i18n      -> arquivos de traducao compartilhados
 infra/             -> docker, variaveis de ambiente
 .github/workflows/ -> pipelines CI/CD
 
+## Estrutura do backend (apps/api/src)
+plugins/
+  i18n.ts              -> i18next, hook onRequest, injeta request.t e request.locale
+  auth.ts              -> decora fastify.authenticate (jwtVerify)
+  workspace-context.ts -> decora fastify.requireWorkspace
+                          resolve workspace por X-Workspace-Id ou subdominio
+                          injeta request.workspaceId, userRole, accountType, clientId
+lib/
+  prisma.ts            -> singleton PrismaClient
+  tokens.ts            -> generateSecureToken(), hashToken()
+routes/
+  auth.ts              -> /auth/register/step1-2-3, /login, /2fa/*, /refresh, /logout,
+                          /forgot-password, /reset-password
+  privacy.ts           -> /privacy/consents/cookies, /my-data, /delete-account, /consents
+  clients.ts           -> /workspaces/:id/clients (CRUD)
+  workspaces.ts        -> /workspaces (CRUD) + /workspaces/:id/members (CRUD)
+jobs/
+  data-deletion.job.ts -> runDataDeletionJob() anonimiza usuarios apos 30 dias
+
 ## Modelo de dados central
 User (locale: pt-BR | es | en)
   -> WorkspaceMember -> Workspace (accountType: AGENCY | SELF)
                             -> Client (isSelf: boolean)
                                   -> SocialAccount (INSTAGRAM | TIKTOK | YOUTUBE)
+
+Modelos LGPD: AuditLog, ConsentRecord, DataDeletionRequest
+Modelos Auth: PasswordResetToken, RefreshToken
+
+## Decisoes tecnicas importantes
+- bcrypt rounds: 12
+- JWT access token: 15 min
+- Refresh token: 7 dias, armazenado como hash SHA-256, rotacionado a cada uso
+- 2FA: otplib (TOTP) + 8 backup codes
+- Prisma output: packages/db/generated/client (no .gitignore)
+  -> CI precisa rodar "pnpm --filter db generate" antes de typecheck/test/build
+- Testes usam vi.hoisted() para mocks do Prisma (nao vi.mock direto com variaveis)
+- workspaceId e clientId NUNCA vem do body — sempre do header ou resolvidos internamente
+- my-data usa select explicito para nunca expor passwordHash, twoFaSecret, tokens
+
+## Estado atual do projeto — Sprint 1 CONCLUIDO
+
+Todos os 3 blocos implementados, testados localmente e com PR aberto para develop.
+
+Bloco 1 (feature/setup-base) — MERGEADO em develop e main
+  Scaffolding monorepo pnpm, i18n, Docker Compose, schema Prisma,
+  migration init, seed (AGENCY + SELF), CI/CD GitHub Actions
+
+Bloco 2 (feature/auth-onboarding) — MERGEADO em develop
+  Registro 3 fases (LGPD), login, 2FA, refresh/logout,
+  reset de senha, cookie consent. 28 testes.
+
+Bloco 3 (feature/multi-tenancy-lgpd) — PR ABERTO para develop
+  Middleware workspace-context, CRUD clientes, CRUD workspaces/membros,
+  rotas LGPD (my-data, delete-account, consents),
+  job de anonimizacao LGPD Art.18. 43 testes.
+
+Total: 43 testes passando no CI.
+
+## Proximo passo — Sprint 2
+Iniciar em nova branch a partir de develop apos merge do Bloco 3.
+Ver arquivo Sprint1_Guia_ClaudeCode_v5.txt secao "PROXIMOS PASSOS — SPRINT 2":
+  - Upload de video para S3/MinIO com URL pre-assinada
+  - Worker de thumbnail com ffmpeg
+  - Integracao Instagram Graph API (Reels)
+  - Integracao TikTok API
+  - Integracao YouTube Data API
+  - Worker de publicacao BullMQ (retry + status)
+  - Stripe: planos, trial, checkout e webhook
+  - Limites por plano com middleware de quota
+  - next-intl no frontend com os 3 idiomas
+  - CI/CD frontend
