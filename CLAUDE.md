@@ -167,14 +167,18 @@ Total: 43 testes passando no CI.
 
 ## Proximo passo — Sprint 2
 Iniciar em nova branch a partir de develop apos merge do Bloco 3.
-Ver arquivo Sprint1_Guia_ClaudeCode_v5.txt secao "PROXIMOS PASSOS — SPRINT 2":
-  - Upload de video para S3/MinIO com URL pre-assinada
-  - Worker de thumbnail com ffmpeg
-  - Integracao Instagram Graph API (Reels)
-  - Integracao TikTok API
-  - Integracao YouTube Data API
-  - Worker de publicacao BullMQ (retry + status)
-  - Stripe: planos, trial, checkout e webhook
-  - Limites por plano com middleware de quota
-  - next-intl no frontend com os 3 idiomas
-  - CI/CD frontend
+Ordem de implementacao definida:
+
+  1. Upload de midia para S3/MinIO com URL pre-assinada
+  2. Worker de thumbnail com ffmpeg
+  3. Worker de publicacao BullMQ (retry + status)
+  4. Integracao YouTube Data API
+  5. Integracao TikTok API
+  6. Integracao Instagram Graph API (Reels)
+  7. next-intl no frontend com os 3 idiomas
+  8. Stripe: planos, trial, checkout e webhook (apos validar integracoes)
+  9. Middleware de quota por plano
+
+  Decisoes:
+  - CI/CD frontend fora do escopo da Sprint 2
+  - Stripe e monetizacao somente apos testes das 3 integracoes de redes sociais
