@@ -5,6 +5,7 @@
   "main": "./index.ts",
   "exports": {
     ".": "./index.ts",
+    "./loader": "./loader.ts",
     "./locales/*": "./locales/*"
   },
   "scripts": {
