@@ -220,9 +220,11 @@ model MediaFile {
   bucket      String
   mimeType    String
   size        Int
-  status      MediaFileStatus @default(PENDING)
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
+  status          MediaFileStatus   @default(PENDING)
+  thumbnailKey    String?
+  thumbnailStatus ThumbnailStatus   @default(PENDING)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
 
   workspace Workspace @relation(fields: [workspaceId], references: [id])
   client    Client    @relation(fields: [clientId], references: [id])
@@ -237,6 +239,14 @@ enum MediaFileStatus {
   PENDING
   READY
   FAILED
+}
+
+enum ThumbnailStatus {
+  PENDING
+  PROCESSING
+  READY
+  FAILED
+  SKIPPED
 }
 
 // ── AUTH ────────────────────────────────────────────────────────────────────────

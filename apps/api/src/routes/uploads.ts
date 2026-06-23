@@ -2,6 +2,7 @@ import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
 import { randomUUID } from 'crypto'
 import { prisma } from '../lib/prisma.js'
+import { thumbnailQueue } from '../lib/queue.js'
 import {
   createPresignedUploadUrl,
   buildPublicUrl,
@@ -143,6 +144,17 @@ export const uploadRoutes = async (app: FastifyInstance) => {
       },
     })
 
+    // Enfileira thumbnail apenas para videos
+    const isVideo = updated.mimeType.startsWith('video/')
+    if (isVideo) {
+      await thumbnailQueue.add('generate', {
+        mediaFileId: updated.id,
+        key: updated.key,
+        workspaceId: request.workspaceId,
+        mimeType: updated.mimeType,
+      })
+    }
+
     return reply.status(200).send({
       id: updated.id,
       key: updated.key,
@@ -150,6 +162,7 @@ export const uploadRoutes = async (app: FastifyInstance) => {
       mimeType: updated.mimeType,
       size: updated.size,
       status: updated.status,
+      thumbnailStatus: isVideo ? 'PENDING' : 'SKIPPED',
     })
   })
 }

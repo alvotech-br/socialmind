@@ -21,6 +21,9 @@ const prismaMock = vi.hoisted(() => ({
 }))
 
 vi.mock('../lib/prisma.js', () => ({ prisma: prismaMock }))
+vi.mock('../lib/queue.js', () => ({
+  thumbnailQueue: { add: vi.fn().mockResolvedValue({}) },
+}))
 vi.mock('../lib/storage.js', () => ({
   createPresignedUploadUrl: vi.fn().mockResolvedValue('https://minio.local/bucket/key?sig=abc'),
   buildPublicUrl: vi.fn((key: string) => `http://localhost:9000/socialplatform-local/${key}`),
