@@ -35,7 +35,7 @@ export const uploadRoutes = async (app: FastifyInstance) => {
       })
     }
 
-    const { filename, mimeType, size, clientId: bodyClientId } = body.data
+    const { mimeType, size, clientId: bodyClientId } = body.data
 
     // clientId: usa o do workspace-context (SELF) ou o enviado (AGENCY)
     const clientId = request.clientId ?? bodyClientId

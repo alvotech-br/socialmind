@@ -126,7 +126,8 @@ describe('publishToTiktok', () => {
   })
 
   it('lanca erro se videoUrl nao for fornecida', async () => {
-    const { videoUrl: _, ...withoutUrl } = baseParams
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { videoUrl: _url, ...withoutUrl } = baseParams
     await expect(publishToTiktok(withoutUrl)).rejects.toThrow('videoUrl')
   })
 
