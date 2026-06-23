@@ -1,4 +1,5 @@
 import type { Platform } from '@social/db'
+import { publishToYoutube } from './youtube.js'
 
 export type PublishResult = {
   platformPostId: string
@@ -7,10 +8,12 @@ export type PublishResult = {
 
 export type PublishParams = {
   caption: string
+  title?: string
   mediaKey?: string
   accessToken: string
   refreshToken?: string
   platformUserId: string
+  socialAccountId: string
 }
 
 export class PlatformNotImplementedError extends Error {
@@ -20,7 +23,12 @@ export class PlatformNotImplementedError extends Error {
   }
 }
 
-// Stubs — substituídos pelos blocos de integração (YouTube, TikTok, Instagram)
 export async function publish(platform: Platform, params: PublishParams): Promise<PublishResult> {
-  throw new PlatformNotImplementedError(platform)
+  switch (platform) {
+    case 'YOUTUBE':
+      return publishToYoutube(params)
+    // TikTok e Instagram — implementados nos próximos blocos
+    default:
+      throw new PlatformNotImplementedError(platform)
+  }
 }

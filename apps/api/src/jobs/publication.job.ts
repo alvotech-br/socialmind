@@ -21,10 +21,12 @@ export async function processPublication(data: PublicationJobData): Promise<void
   try {
     const result = await publish(post.platform, {
       caption: post.caption,
+      title: post.title ?? undefined,
       mediaKey: post.mediaFileId ?? undefined,
       accessToken: post.socialAccount.accessToken,
       refreshToken: post.socialAccount.refreshToken ?? undefined,
       platformUserId: post.socialAccount.platformUserId,
+      socialAccountId: post.socialAccountId,
     })
 
     await prisma.post.update({

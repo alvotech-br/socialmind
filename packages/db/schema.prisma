@@ -220,6 +220,7 @@ model Post {
   clientId        String
   socialAccountId String
   mediaFileId     String?
+  title           String?
   caption         String
   platform        Platform
   scheduledAt     DateTime

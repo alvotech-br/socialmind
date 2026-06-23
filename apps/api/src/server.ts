@@ -13,6 +13,7 @@ import { clientRoutes } from './routes/clients.js'
 import { workspaceRoutes } from './routes/workspaces.js'
 import { uploadRoutes } from './routes/uploads.js'
 import { postRoutes } from './routes/posts.js'
+import { socialAuthRoutes } from './routes/social-auth.js'
 
 const SENSITIVE_FIELDS = ['password', 'passwordHash', 'accessToken', 'refreshToken', 'twoFaSecret']
 
@@ -40,6 +41,7 @@ export const buildApp = async () => {
   await app.register(clientRoutes, { prefix: '/workspaces/:workspaceId/clients' })
   await app.register(uploadRoutes, { prefix: '/uploads' })
   await app.register(postRoutes, { prefix: '/workspaces/:workspaceId/posts' })
+  await app.register(socialAuthRoutes, { prefix: '/social-auth' })
 
   app.get('/health', async () => ({
     status: 'ok',
