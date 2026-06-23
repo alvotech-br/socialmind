@@ -91,7 +91,7 @@ export const postRoutes = async (app: FastifyInstance) => {
 
     await prisma.auditLog.create({
       data: {
-        userId: request.user.id,
+        userId: (request.user as { id: string }).id,
         workspaceId: request.workspaceId,
         action: 'post.scheduled',
         entity: 'Post',
@@ -216,7 +216,7 @@ export const postRoutes = async (app: FastifyInstance) => {
 
     await prisma.auditLog.create({
       data: {
-        userId: request.user.id,
+        userId: (request.user as { id: string }).id,
         workspaceId: request.workspaceId,
         action: 'post.cancelled',
         entity: 'Post',

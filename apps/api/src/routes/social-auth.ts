@@ -1,4 +1,4 @@
-import type { FastifyInstance } from 'fastify'
+import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
 import { z } from 'zod'
 import { prisma } from '../lib/prisma.js'
 import { getYoutubeAuthUrl, exchangeYoutubeCode } from '../lib/publishers/youtube.js'
@@ -34,22 +34,20 @@ const callbackQuerySchema = z.object({
   error_reason: z.string().optional(),
 })
 
+type AuthRequest = FastifyRequest & { workspaceId: string; clientId?: string }
+
 async function resolveClientId(
-  request: Parameters<Parameters<FastifyInstance['get']>[1]>[0] & {
-    workspaceId: string
-    clientId?: string
-    t: (key: string) => string
-  },
-  reply: Parameters<Parameters<FastifyInstance['get']>[1]>[1],
+  request: AuthRequest,
+  reply: FastifyReply,
   queryClientId?: string,
 ): Promise<string | null> {
-  const clientId = (request as { clientId?: string }).clientId ?? queryClientId
+  const clientId = request.clientId ?? queryClientId
   if (!clientId) {
     reply.status(400).send({ error: 'VALIDATION_ERROR', message: request.t('errors:missingClientId') })
     return null
   }
   const client = await prisma.client.findFirst({
-    where: { id: clientId, workspaceId: (request as { workspaceId: string }).workspaceId, deletedAt: null },
+    where: { id: clientId, workspaceId: request.workspaceId, deletedAt: null },
   })
   if (!client) {
     reply.status(404).send({ error: 'NOT_FOUND', message: request.t('errors:notFound') })
@@ -156,12 +154,10 @@ export const socialAuthRoutes = async (app: FastifyInstance) => {
     const q = connectQuerySchema.safeParse(request.query)
     if (!q.success) return reply.status(400).send({ error: 'VALIDATION_ERROR' })
 
-    // @ts-expect-error — decorators injetados pelos plugins (workspaceId, clientId)
-    const clientId = await resolveClientId(request, reply, q.data.clientId)
+    const clientId = await resolveClientId(request as AuthRequest, reply, q.data.clientId)
     if (!clientId) return
 
-    // @ts-expect-error — workspaceId injetado pelo workspace-context plugin
-    const state = generateState(request.workspaceId, clientId)
+    const state = generateState((request as AuthRequest).workspaceId, clientId)
     return reply.status(200).send({ authUrl: getTiktokAuthUrl(state) })
   })
 
@@ -196,12 +192,10 @@ export const socialAuthRoutes = async (app: FastifyInstance) => {
     const q = connectQuerySchema.safeParse(request.query)
     if (!q.success) return reply.status(400).send({ error: 'VALIDATION_ERROR' })
 
-    // @ts-expect-error — decorators injetados pelos plugins (workspaceId, clientId)
-    const clientId = await resolveClientId(request, reply, q.data.clientId)
+    const clientId = await resolveClientId(request as AuthRequest, reply, q.data.clientId)
     if (!clientId) return
 
-    // @ts-expect-error — workspaceId injetado pelo workspace-context plugin
-    const state = generateState(request.workspaceId, clientId)
+    const state = generateState((request as AuthRequest).workspaceId, clientId)
     return reply.status(200).send({ authUrl: getInstagramAuthUrl(state) })
   })
 

@@ -66,7 +66,7 @@ export const uploadRoutes = async (app: FastifyInstance) => {
       data: {
         workspaceId: request.workspaceId,
         clientId,
-        uploadedBy: request.user.id,
+        uploadedBy: (request.user as { id: string }).id,
         key,
         bucket: process.env.S3_BUCKET ?? 'socialplatform-local',
         mimeType,
@@ -77,7 +77,7 @@ export const uploadRoutes = async (app: FastifyInstance) => {
 
     await prisma.auditLog.create({
       data: {
-        userId: request.user.id,
+        userId: (request.user as { id: string }).id,
         workspaceId: request.workspaceId,
         action: 'media.presignedUrlCreated',
         entity: 'MediaFile',
@@ -135,7 +135,7 @@ export const uploadRoutes = async (app: FastifyInstance) => {
 
     await prisma.auditLog.create({
       data: {
-        userId: request.user.id,
+        userId: (request.user as { id: string }).id,
         workspaceId: request.workspaceId,
         action: 'media.confirmed',
         entity: 'MediaFile',

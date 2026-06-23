@@ -37,7 +37,7 @@ export const billingRoutes = async (app: FastifyInstance) => {
     // Cria ou reutiliza customer do Stripe
     let customerId = workspace.stripeCustomerId
     if (!customerId) {
-      const user = await prisma.user.findUnique({ where: { id: request.user.id } })
+      const user = await prisma.user.findUnique({ where: { id: (request.user as { id: string }).id } })
       const customer = await stripe.customers.create({
         email: user?.email ?? undefined,
         name: workspace.name,
@@ -65,7 +65,7 @@ export const billingRoutes = async (app: FastifyInstance) => {
 
     await prisma.auditLog.create({
       data: {
-        userId: request.user.id,
+        userId: (request.user as { id: string }).id,
         workspaceId: workspace.id,
         action: 'billing.checkoutStarted',
         entity: 'Workspace',

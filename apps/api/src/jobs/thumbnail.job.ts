@@ -79,7 +79,7 @@ function streamToFile(stream: NodeJS.ReadableStream, filePath: string): Promise<
 function extractFrame(inputPath: string, outputPath: string): Promise<void> {
   return new Promise((resolve, reject) => {
     ffmpeg(inputPath)
-      .on('end', resolve)
+      .on('end', () => resolve())
       .on('error', reject)
       .screenshots({
         timestamps: ['00:00:01'],

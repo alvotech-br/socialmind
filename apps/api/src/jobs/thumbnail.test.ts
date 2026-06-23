@@ -42,8 +42,8 @@ vi.mock('fs', () => ({
 
 vi.mock('fluent-ffmpeg', () => {
   const screenshots = vi.fn().mockReturnThis()
-  const on = vi.fn((event: string, cb: () => void) => {
-    if (event === 'end') setTimeout(cb, 0)
+  const on = vi.fn((event: string, cb: (...args: unknown[]) => void) => {
+    if (event === 'end') setTimeout(() => cb(), 0)
     return { screenshots, on }
   })
   return { default: vi.fn(() => ({ on, screenshots })) }
