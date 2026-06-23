@@ -145,6 +145,11 @@ Modelos Auth: PasswordResetToken, RefreshToken
 - Testes usam vi.hoisted() para mocks do Prisma (nao vi.mock direto com variaveis)
 - workspaceId e clientId NUNCA vem do body — sempre do header ou resolvidos internamente
 - my-data usa select explicito para nunca expor passwordHash, twoFaSecret, tokens
+- IDs nos testes devem ser UUIDs validos (somente hex: 0-9, a-f) — ex: 'aa000000-0000-0000-0000-000000000001'
+  Prefixos como 'ws-', 'sa-', 'po-' contem letras invalidas e falham no z.string().uuid()
+- State CSRF do OAuth (YouTube/TikTok/Instagram) armazenado em Map em memoria com TTL 10min
+  Suficiente para single-instance. Se escalar para multi-instance: mover para Redis
+  Arquivo: apps/api/src/routes/social-auth.ts (pendingStates)
 
 ## Estado atual do projeto — Sprint 1 CONCLUIDO
 
