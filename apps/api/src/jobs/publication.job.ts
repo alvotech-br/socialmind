@@ -1,5 +1,6 @@
 import { prisma } from '../lib/prisma.js'
 import { publish, PlatformNotImplementedError } from '../lib/publishers/index.js'
+import { buildPublicUrl } from '../lib/storage.js'
 import type { PublicationJobData } from '../lib/queue.js'
 
 export async function processPublication(data: PublicationJobData): Promise<void> {
@@ -19,10 +20,12 @@ export async function processPublication(data: PublicationJobData): Promise<void
   })
 
   try {
+    const mediaKey = post.mediaFileId ?? undefined
     const result = await publish(post.platform, {
       caption: post.caption,
       title: post.title ?? undefined,
-      mediaKey: post.mediaFileId ?? undefined,
+      mediaKey,
+      videoUrl: mediaKey ? buildPublicUrl(mediaKey) : undefined,
       accessToken: post.socialAccount.accessToken,
       refreshToken: post.socialAccount.refreshToken ?? undefined,
       platformUserId: post.socialAccount.platformUserId,
