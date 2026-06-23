@@ -86,7 +86,7 @@ export const useAuthStore = create<AuthState>()(
     {
       name: 'auth-storage',
       partialize: (s) => ({ user: s.user, workspaceId: s.workspaceId }),
-      // Não persistimos accessToken — ele é renovado via refresh cookie
+      skipHydration: true,
     },
   ),
 )
