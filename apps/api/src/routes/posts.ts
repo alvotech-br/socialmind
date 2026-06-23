@@ -2,6 +2,7 @@ import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
 import { prisma } from '../lib/prisma.js'
 import { publicationQueue } from '../lib/queue.js'
+import { enforcePostQuota } from '../plugins/quota.js'
 
 const createPostSchema = z.object({
   socialAccountId: z.string().uuid(),
@@ -15,7 +16,7 @@ const PLATFORMS = ['INSTAGRAM', 'TIKTOK', 'YOUTUBE'] as const
 export const postRoutes = async (app: FastifyInstance) => {
   // POST /workspaces/:workspaceId/posts
   app.post('/', {
-    preHandler: [app.authenticate, app.requireWorkspace],
+    preHandler: [app.authenticate, app.requireWorkspace, enforcePostQuota as never],
   }, async (request, reply) => {
     const body = createPostSchema.safeParse(request.body)
     if (!body.success) {
@@ -80,6 +81,12 @@ export const postRoutes = async (app: FastifyInstance) => {
     await prisma.post.update({
       where: { id: post.id },
       data: { jobId: job.id ?? null },
+    })
+
+    // Incrementa contador de posts do mês
+    await prisma.workspace.update({
+      where: { id: request.workspaceId },
+      data: { postsThisMonth: { increment: 1 } },
     })
 
     await prisma.auditLog.create({

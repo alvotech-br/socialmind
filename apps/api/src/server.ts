@@ -14,6 +14,8 @@ import { workspaceRoutes } from './routes/workspaces.js'
 import { uploadRoutes } from './routes/uploads.js'
 import { postRoutes } from './routes/posts.js'
 import { socialAuthRoutes } from './routes/social-auth.js'
+import { billingRoutes } from './routes/billing.js'
+import { webhookRoutes } from './routes/webhook.js'
 
 const SENSITIVE_FIELDS = ['password', 'passwordHash', 'accessToken', 'refreshToken', 'twoFaSecret']
 
@@ -42,6 +44,9 @@ export const buildApp = async () => {
   await app.register(uploadRoutes, { prefix: '/uploads' })
   await app.register(postRoutes, { prefix: '/workspaces/:workspaceId/posts' })
   await app.register(socialAuthRoutes, { prefix: '/social-auth' })
+  await app.register(billingRoutes, { prefix: '/billing' })
+  // Webhook antes do body parser JSON — precisa do rawBody bruto para verificação Stripe
+  await app.register(webhookRoutes, { prefix: '/webhook' })
 
   app.get('/health', async () => ({
     status: 'ok',
