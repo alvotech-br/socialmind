@@ -14,5 +14,7 @@
   "invalidMimeType": "Tipo de arquivo não permitido",
   "fileTooLarge": "O arquivo excede o tamanho máximo permitido (500 MB)",
   "missingClientId": "É necessário informar o cliente para este upload",
-  "mediaAlreadyConfirmed": "Este arquivo já foi confirmado"
+  "mediaAlreadyConfirmed": "Este arquivo já foi confirmado",
+  "mediaNotReady": "O arquivo de mídia ainda não está pronto para publicação",
+  "postCannotBeCancelled": "Este post não pode ser cancelado no status atual"
 }

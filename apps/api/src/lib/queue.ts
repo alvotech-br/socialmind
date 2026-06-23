@@ -21,3 +21,18 @@ export type ThumbnailJobData = {
   workspaceId: string
   mimeType: string
 }
+
+export const publicationQueue = new Queue('publication', {
+  connection: redisConnection,
+  defaultJobOptions: {
+    attempts: 5,
+    backoff: { type: 'exponential', delay: 10000 },
+    removeOnComplete: { count: 200 },
+    removeOnFail: { count: 500 },
+  },
+})
+
+export type PublicationJobData = {
+  postId: string
+  workspaceId: string
+}

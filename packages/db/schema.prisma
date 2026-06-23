@@ -59,6 +59,7 @@ model Workspace {
   clients    Client[]
   auditLogs  AuditLog[]
   mediaFiles MediaFile[]
+  posts      Post[]
 }
 
 enum AccountType {
@@ -111,6 +112,7 @@ model Client {
   workspace      Workspace       @relation(fields: [workspaceId], references: [id])
   socialAccounts SocialAccount[]
   mediaFiles     MediaFile[]
+  posts          Post[]
 
   @@index([workspaceId, deletedAt])
 }
@@ -131,6 +133,7 @@ model SocialAccount {
   updatedAt      DateTime  @updatedAt
 
   client Client @relation(fields: [clientId], references: [id])
+  posts  Post[]
 
   @@unique([clientId, platform])
   @@index([clientId, platform])
@@ -209,6 +212,43 @@ enum DeletionStatus {
   CANCELLED
 }
 
+// ── POSTS ──────────────────────────────────────────────────────────────────────
+
+model Post {
+  id              String      @id @default(uuid())
+  workspaceId     String
+  clientId        String
+  socialAccountId String
+  mediaFileId     String?
+  caption         String
+  platform        Platform
+  scheduledAt     DateTime
+  publishedAt     DateTime?
+  status          PostStatus  @default(DRAFT)
+  failureReason   String?
+  attempts        Int         @default(0)
+  jobId           String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  workspace     Workspace     @relation(fields: [workspaceId], references: [id])
+  client        Client        @relation(fields: [clientId], references: [id])
+  socialAccount SocialAccount @relation(fields: [socialAccountId], references: [id])
+  mediaFile     MediaFile?    @relation(fields: [mediaFileId], references: [id])
+
+  @@index([workspaceId, status])
+  @@index([scheduledAt, status])
+}
+
+enum PostStatus {
+  DRAFT
+  SCHEDULED
+  PROCESSING
+  PUBLISHED
+  FAILED
+  CANCELLED
+}
+
 // ── MIDIA ──────────────────────────────────────────────────────────────────────
 
 model MediaFile {
@@ -229,6 +269,7 @@ model MediaFile {
   workspace Workspace @relation(fields: [workspaceId], references: [id])
   client    Client    @relation(fields: [clientId], references: [id])
   uploader  User      @relation(fields: [uploadedBy], references: [id])
+  posts     Post[]
 
   @@index([workspaceId])
   @@index([clientId])
