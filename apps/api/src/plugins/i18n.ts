@@ -1,8 +1,13 @@
 import fp from 'fastify-plugin'
+import path from 'path'
+import { fileURLToPath } from 'url'
 import type { FastifyPluginAsync, FastifyRequest } from 'fastify'
 import i18next, { TFunction } from 'i18next'
 import FsBackend from 'i18next-fs-backend'
-import { localesDir, defaultLocale, locales, namespaces } from '@social/i18n'
+import { defaultLocale, locales, namespaces } from '@social/i18n'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const localesDir = path.join(__dirname, '../../../../packages/i18n/locales')
 
 declare module 'fastify' {
   interface FastifyInstance {
