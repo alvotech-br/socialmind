@@ -120,7 +120,7 @@ export const socialAuthRoutes = async (app: FastifyInstance) => {
     const clientId = await resolveClientId(request, reply, q.data.clientId)
     if (!clientId) return
 
-    // @ts-expect-error
+    // @ts-expect-error — workspaceId injetado pelo workspace-context plugin
     const state = generateState(request.workspaceId, clientId)
     return reply.status(200).send({ authUrl: getYoutubeAuthUrl(state) })
   })
