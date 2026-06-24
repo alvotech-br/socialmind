@@ -26,12 +26,13 @@ model User {
   updatedAt        DateTime  @updatedAt
   deletedAt        DateTime?
 
-  workspaceMembers   WorkspaceMember[]
-  auditLogs          AuditLog[]
-  consentRecords     ConsentRecord[]
-  passwordResetTokens PasswordResetToken[]
-  refreshTokens      RefreshToken[]
+  workspaceMembers     WorkspaceMember[]
+  auditLogs            AuditLog[]
+  consentRecords       ConsentRecord[]
+  passwordResetTokens  PasswordResetToken[]
+  refreshTokens        RefreshToken[]
   dataDeletionRequests DataDeletionRequest[]
+  mediaFiles           MediaFile[]
 }
 
 // ── WORKSPACES ─────────────────────────────────────────────────────────────────
@@ -54,9 +55,11 @@ model Workspace {
   updatedAt            DateTime    @updatedAt
   deletedAt            DateTime?
 
-  members  WorkspaceMember[]
-  clients  Client[]
-  auditLogs AuditLog[]
+  members    WorkspaceMember[]
+  clients    Client[]
+  auditLogs  AuditLog[]
+  mediaFiles MediaFile[]
+  posts      Post[]
 }
 
 enum AccountType {
@@ -108,6 +111,8 @@ model Client {
 
   workspace      Workspace       @relation(fields: [workspaceId], references: [id])
   socialAccounts SocialAccount[]
+  mediaFiles     MediaFile[]
+  posts          Post[]
 
   @@index([workspaceId, deletedAt])
 }
@@ -128,6 +133,7 @@ model SocialAccount {
   updatedAt      DateTime  @updatedAt
 
   client Client @relation(fields: [clientId], references: [id])
+  posts  Post[]
 
   @@unique([clientId, platform])
   @@index([clientId, platform])
@@ -204,6 +210,85 @@ enum DeletionStatus {
   PROCESSING
   COMPLETED
   CANCELLED
+}
+
+// ── POSTS ──────────────────────────────────────────────────────────────────────
+
+model Post {
+  id              String      @id @default(uuid())
+  workspaceId     String
+  clientId        String
+  socialAccountId String
+  mediaFileId     String?
+  title           String?
+  caption         String
+  platform        Platform
+  scheduledAt     DateTime
+  publishedAt     DateTime?
+  status          PostStatus  @default(DRAFT)
+  failureReason   String?
+  attempts        Int         @default(0)
+  jobId           String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  workspace     Workspace     @relation(fields: [workspaceId], references: [id])
+  client        Client        @relation(fields: [clientId], references: [id])
+  socialAccount SocialAccount @relation(fields: [socialAccountId], references: [id])
+  mediaFile     MediaFile?    @relation(fields: [mediaFileId], references: [id])
+
+  @@index([workspaceId, status])
+  @@index([scheduledAt, status])
+}
+
+enum PostStatus {
+  DRAFT
+  SCHEDULED
+  PROCESSING
+  PUBLISHED
+  FAILED
+  CANCELLED
+}
+
+// ── MIDIA ──────────────────────────────────────────────────────────────────────
+
+model MediaFile {
+  id          String          @id @default(uuid())
+  workspaceId String
+  clientId    String
+  uploadedBy  String
+  key         String          @unique
+  bucket      String
+  mimeType    String
+  size        Int
+  status          MediaFileStatus   @default(PENDING)
+  thumbnailKey    String?
+  thumbnailStatus ThumbnailStatus   @default(PENDING)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id])
+  client    Client    @relation(fields: [clientId], references: [id])
+  uploader  User      @relation(fields: [uploadedBy], references: [id])
+  posts     Post[]
+
+  @@index([workspaceId])
+  @@index([clientId])
+  @@index([uploadedBy])
+}
+
+enum MediaFileStatus {
+  PENDING
+  READY
+  FAILED
+}
+
+enum ThumbnailStatus {
+  PENDING
+  PROCESSING
+  READY
+  FAILED
+  SKIPPED
 }
 
 // ── AUTH ────────────────────────────────────────────────────────────────────────

@@ -12,5 +12,51 @@
   "search": "Buscar",
   "close": "Cerrar",
   "yes": "Sí",
-  "no": "No"
+  "no": "No",
+  "or": "o",
+  "nav": {
+    "dashboard": "Dashboard",
+    "posts": "Posts",
+    "clients": "Clientes",
+    "connections": "Conexiones",
+    "settings": "Configuración"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "scheduledPosts": "Posts programados",
+    "publishedPosts": "Posts publicados",
+    "failedPosts": "Posts fallidos",
+    "recentActivity": "Actividad reciente"
+  },
+  "posts": {
+    "title": "Posts",
+    "new": "Nuevo post",
+    "scheduled": "Programado",
+    "published": "Publicado",
+    "failed": "Fallido",
+    "draft": "Borrador",
+    "processing": "Procesando",
+    "cancelled": "Cancelado",
+    "caption": "Descripción",
+    "scheduleFor": "Programar para",
+    "platform": "Plataforma",
+    "cancel": "Cancelar post"
+  },
+  "connections": {
+    "title": "Conexiones",
+    "connect": "Conectar",
+    "disconnect": "Desconectar",
+    "connected": "Conectado",
+    "notConnected": "No conectado",
+    "reconnect": "Reconectar",
+    "youtube": "YouTube",
+    "tiktok": "TikTok",
+    "instagram": "Instagram"
+  },
+  "language": "Idioma",
+  "languages": {
+    "pt-BR": "Português",
+    "en": "English",
+    "es": "Español"
+  }
 }

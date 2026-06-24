@@ -1,8 +1,12 @@
 import fp from 'fastify-plugin'
+import path from 'path'
 import type { FastifyPluginAsync, FastifyRequest } from 'fastify'
 import i18next, { TFunction } from 'i18next'
 import FsBackend from 'i18next-fs-backend'
-import { localesDir, defaultLocale, locales, namespaces } from '@social/i18n'
+import { defaultLocale, locales, namespaces } from '@social/i18n'
+
+// __dirname é global em CommonJS (module: NodeNext sem "type":"module")
+const localesDir = path.join(__dirname, '../../../../packages/i18n/locales')
 
 declare module 'fastify' {
   interface FastifyInstance {
