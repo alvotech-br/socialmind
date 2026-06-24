@@ -41,14 +41,13 @@ vi.mock('fs', () => ({
 }))
 
 vi.mock('fluent-ffmpeg', () => {
-  const screenshots = vi.fn().mockReturnThis()
-  const self: { on: ReturnType<typeof vi.fn> } = {
-    on: vi.fn((event: string, cb: (...args: unknown[]) => void) => {
-      if (event === 'end') setTimeout(() => cb(), 0)
-      return { screenshots, on: self.on }
-    }),
-  }
-  return { default: vi.fn(() => ({ on: self.on, screenshots })) }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const builder: any = { screenshots: vi.fn().mockReturnThis(), on: vi.fn() }
+  builder.on.mockImplementation((event: string, cb: (...args: unknown[]) => void) => {
+    if (event === 'end') setTimeout(() => cb(), 0)
+    return builder
+  })
+  return { default: vi.fn(() => builder) }
 })
 
 beforeEach(() => {
