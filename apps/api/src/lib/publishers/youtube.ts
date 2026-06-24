@@ -1,4 +1,5 @@
 import { google } from 'googleapis'
+import type { OAuth2Client } from 'google-auth-library'
 import { createReadStream } from 'fs'
 import { unlink, mkdir, writeFile } from 'fs/promises'
 import { tmpdir } from 'os'
@@ -13,7 +14,7 @@ const YOUTUBE_SCOPES = [
   'https://www.googleapis.com/auth/youtube.readonly',
 ]
 
-export function createOAuth2Client() {
+export function createOAuth2Client(): OAuth2Client {
   return new google.auth.OAuth2(
     process.env.YOUTUBE_CLIENT_ID,
     process.env.YOUTUBE_CLIENT_SECRET,
