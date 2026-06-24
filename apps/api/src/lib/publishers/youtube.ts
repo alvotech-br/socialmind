@@ -1,5 +1,4 @@
 import { google } from 'googleapis'
-import type { OAuth2Client } from 'google-auth-library'
 import { createReadStream } from 'fs'
 import { unlink, mkdir, writeFile } from 'fs/promises'
 import { tmpdir } from 'os'
@@ -14,7 +13,7 @@ const YOUTUBE_SCOPES = [
   'https://www.googleapis.com/auth/youtube.readonly',
 ]
 
-export function createOAuth2Client(): OAuth2Client {
+export function createOAuth2Client(): InstanceType<typeof google.auth.OAuth2> {
   return new google.auth.OAuth2(
     process.env.YOUTUBE_CLIENT_ID,
     process.env.YOUTUBE_CLIENT_SECRET,
@@ -72,7 +71,7 @@ export async function publishToYoutube(
   })
 
   // Atualiza tokens no banco se forem renovados
-  oauth2.on('tokens', async (tokens) => {
+  oauth2.on('tokens', async (tokens: { access_token?: string | null; refresh_token?: string | null; expiry_date?: number | null }) => {
     await prisma.socialAccount.update({
       where: { id: params.socialAccountId },
       data: {
