@@ -42,7 +42,9 @@ vi.mock('fs', () => ({
 
 vi.mock('fluent-ffmpeg', () => {
   const screenshots = vi.fn().mockReturnThis()
-  const on = vi.fn((event: string, cb: (...args: unknown[]) => void) => {
+  // eslint-disable-next-line prefer-const
+  let on: ReturnType<typeof vi.fn>
+  on = vi.fn((event: string, cb: (...args: unknown[]) => void) => {
     if (event === 'end') setTimeout(() => cb(), 0)
     return { screenshots, on }
   })
@@ -95,7 +97,7 @@ describe('processThumbnail', () => {
     ;(s3.send as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ Body: mockBody })
 
     const ffmpegModule = await import('fluent-ffmpeg')
-    const ffmpegFn = ffmpegModule.default as ReturnType<typeof vi.fn>
+    const ffmpegFn = ffmpegModule.default as unknown as ReturnType<typeof vi.fn>
     ffmpegFn.mockReturnValueOnce({
       on: vi.fn((event: string, cb: (err?: Error) => void) => {
         if (event === 'error') setTimeout(() => cb(new Error('ffmpeg crashed')), 0)
